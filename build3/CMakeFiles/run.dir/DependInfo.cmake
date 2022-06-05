@@ -4,20 +4,19 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/main4.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/main4.cpp.o"
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/src/ArmorDetector.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/ArmorDetector.cpp.o"
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/src/CRC_Check.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/CRC_Check.cpp.o"
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/src/KAL.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/KAL.cpp.o"
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/src/Thread.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/Thread.cpp.o"
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/src/camera.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/camera.cpp.o"
-  "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/src/serialport.cpp" "/home/dji/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/serialport.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/main4.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/main4.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/src/ArmorDetector.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/ArmorDetector.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/src/CRC_Check.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/CRC_Check.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/src/KAL.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/KAL.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/src/Thread.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/Thread.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/src/camera.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/camera.cpp.o"
+  "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/src/serialport.cpp" "/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir/src/serialport.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/usr/local/include"
-  "/usr/local/include/opencv"
+  "/usr/local/include/opencv4"
   "/usr/include/eigen3"
   "../include"
   "../include/camera"
