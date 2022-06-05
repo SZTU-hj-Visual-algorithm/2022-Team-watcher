@@ -117,9 +117,10 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	{
 		t = time;
 		double height = get_gravity(m_pc);
-		double xishu = 5.05 * (2.58/m_pc(2,0));
-		send.yaw = atan2(m_pc(0,0) + 0.106,m_pc(2,0)) / CV_PI*180.0 - ab_yaw;
-		send.pitch = atan2(m_pc(1,0) -0.055 - height*xishu,m_pc(2,0)) / CV_PI*180.0 - ab_pitch;
+//		double xishu = 5.05 * (2.58/m_pc(2,0));
+//		send.yaw = atan2(m_pc(0,0) + 0.106,m_pc(2,0)) / CV_PI*180.0 - ab_yaw;
+//		send.pitch = atan2(m_pc(1,0) -0.055 - height*xishu,m_pc(2,0)) / CV_PI*180.0 - ab_pitch;
+        get_send(m_pc,height);
 		kf.Xk_1[0] = m_pd(0,0);
 		kf.Xk_1[3] = m_pd(1,0);
 		//last_yaw = ra_yaw + ab_yaw;
@@ -127,44 +128,7 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 //		last_aim_yaw = ra_yaw - ab_yaw;
 		return true;
 	}
-	
-	/*if (last_ct.x == -1 && last_ct.y == -1)
-	{
-		last_ct.x = bp.x;
-		last_ct.y = bp.y;
-	}*/
-	/*else
-	{
-		if (bp.x - last_ct.x < -10.0)
-		{
-			sp_reset(kf);
-		}
-	}*/
-	
-//	if (aim_yaw - last_aim_yaw < 5 && aim_pitch - last_aim_pitch < 5)
-//	{
-//		stop_predict++;
-//	}
-//	else
-//	{
-//		stop_predict = 0;
-//	}
-//
-	/*if (last_aim_yaw ==0 && last_aim_pitch ==0)
-	{
-		last_aim_pitch = ra_pitch;
-		last_aim_yaw = ra_yaw;
-	}*/
 
-	
-	//-------------------------------------------------------------------------
-	/*if (abs(last_ct.x - bp.x) < 10)
-	{
-		double v = kf.Xk_1[1];
-		double a = kf.Xk_1[2];
-		kf.Xk_1[1] = -(v/abs(v))*0.0001;
-		kf.Xk_1[2] = -(a/abs(a))*0.001;
-	}*/
 	Eigen::Matrix<double, 2, 1> measured;
 	measured << m_pd(0,0), m_pd(1,0);
 	
@@ -193,51 +157,9 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	Eigen::Matrix<double, 6, 1> pre_xy = kf.predict(predict_time,true);
 	
 	shoot_delay = (fabs(pre_xy[1])/1.8)*shoot_delay_init;
-	//printf("shoot_delay:%lf\n",shoot_delay);
-	/*if ((-0.066<pre_xy[1] && pre_xy[1]< 0.066) && (-0.04<pre_xy[2] && pre_xy[2]< 0.04))
-	{
-		shoot_delay = 0.47;
-	}
-	else
-	{
-		shoot_delay = 0.2916;
-	}*/
-	//预测得到的目标绝对角度----------------------------------------------------------
-	
-//	double need_yaw;
-//	double need_pitch;
-	//-------------------------------------------------------------------------------
 	
 	
-	//--����������ϵ�µ�Ԥ���λӳ�䵽�������ϵ��---------------------------------------
-//	if (stop_predict >= 8)
-//	{
-//		need_yaw = corrected[0] + ab_yaw;
-//		need_pitch = corrected[3] + ab_pitch;
-//	}
-//	else
-//	{
-//	need_yaw = atan2(pre_xy[0] , depth)/PI*180.0 + ab_yaw;
-//	need_pitch = atan2(pre_xy[3] , depth)/PI*180.0 + ab_pitch;
-//	}
-	
-	
-	Eigen::Vector3d pos3 = {pre_xy[0],pre_xy[3],m_pd(2,0)};
-	//printf("x_v:%lf\tx_a:%lf\ny_v:%lf\ty_a:%lf\n",pre_xy[1],pre_xy[2],pre_xy[4],pre_xy[5]);
-	//printf("x:%lf\ty:%lf\n",pre_xy[0],pre_xy[3]);	
-	/*if (-0.10 < pre_xy[1] && pre_xy[1]< 0.086)
-	{
-		send.yaw = (1.0-filter)*ra_yaw + filter*last_aim_yaw - ab_yaw;
-		send.pitch = (1.0-filter)*ra_pitch + filter*last_aim_pitch - ab_pitch;
-		last_aim_pitch = ra_pitch;
-		last_aim_yaw = ra_yaw;
-		circle(_src, bp, 7, Scalar(255,255,0),3);
-		printf("aim stoped\n");
-		imshow("src_kal",_src);
-		return true;
-	}*/
-	//last_aim_pitch = ra_pitch;
-	//last_aim_yaw = ra_yaw;
+	Eigen::Vector3d pos3 = {pre_xy[0],pre_xy[3],m_pd(2,0)};;
 	pos3 = rotated_matrix.inverse()*pos3;
 	pos3 = {pos3[0],pos3[1],depth};
 	
@@ -280,23 +202,11 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	//�������нǶȶ���תΪ�Ƕ���
 	
 	
-	send.yaw = atan2(pos3(0, 0) + 0.106, pos3(2, 0))/PI * 180.0 - ab_yaw;//atan2�ĽǶȷ�Χ��-180~180���պ����нǶȶ��и���,������
-	printf("pos_x:%lf\n",pos3(0,0));
-	/*if (-0.086 < pre_xy[1] && pre_xy[1]< 0.086)
-	{
-		send.yaw = 0.2 * last_yaw + 0.8 * send.yaw; 
-	}
-	else
-	{
-		send.yaw = 0.01*last_yaw + 0.99 * send.yaw;
-	}*/
-	double xishu = 5.02 * (2.27/pos3(2,0));
-
-	send.pitch = atan2(pos3(1, 0) - 0.055 - height *  xishu, pos3(2, 0))/PI * 180.0 - ab_pitch;
-	//send.yaw = ra_yaw + ab_yaw;
-	//send.pitch =ra_pitch - ab_pitch;
-	//-----------------------------------------------------------------------------------
-	//printf("height:%f\n",height);
+//	send.yaw = atan2(pos3(0, 0) + 0.106, pos3(2, 0))/PI * 180.0 - ab_yaw;//atan2�ĽǶȷ�Χ��-180~180���պ����нǶȶ��и���,������
+//	printf("pos_x:%lf\n",pos3(0,0));
+//	double xishu = 5.02 * (2.27/pos3(2,0));
+//	send.pitch = atan2(pos3(1, 0) - 0.055 - height *  xishu, pos3(2, 0))/PI * 180.0 - ab_pitch;
+    get_send(pos3,height);
 	return true;
 	
 }
