@@ -91,7 +91,7 @@ bool Camera::read_frame_raw()
 			cvReleaseImageHeader(&ipiimage);
 		}
 		//创建raw图像数据的头指针
-		ipiimage = cvCreateImageHeader(cvSize(frame_h.iWidth, frame_h.iHeight), IPL_DEPTH_8U, 1);
+		ipiimage = cvCreateImageHeader(CvSize(frame_h.iWidth, frame_h.iHeight), IPL_DEPTH_8U, 1);
 		
 		//由于sdk读取数据是从底部到顶部读取，所以要将图像数据垂直翻转
 		//CameraFlipFrameBuffer(pbybuffer, &frame_h, 3);
@@ -125,7 +125,7 @@ bool Camera::read_frame_rgb()
 		}
 		
 		//新建一个图像数据头指针
-		ipiimage = cvCreateImageHeader(cvSize(frame_h.iWidth, frame_h.iHeight), IPL_DEPTH_8U, channel);
+		ipiimage = cvCreateImageHeader(CvSize(frame_h.iWidth, frame_h.iHeight), IPL_DEPTH_8U, channel);
 		
 		//将图像数据垂直翻转
 		//CameraFlipFrameBuffer(rgb_buffer, &frame_h, 3);

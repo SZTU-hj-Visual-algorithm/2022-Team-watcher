@@ -7,7 +7,7 @@ SET(BIN_NAME "run")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-find_package(OpenCV 4.5.5 REQUIRED)
+find_package(OpenCV 3.4.7 REQUIRED)
 find_package(Eigen3 REQUIRED)
 #find_package(Threads REQUIRED)
 find_package(X11 REQUIRED)

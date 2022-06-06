@@ -1,3 +1,0 @@
-/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/rebuild_cache.dir
-/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/run.dir
-/home/nvidia/Desktop/a_miaosuan_v6.3.1_new_watcher/build3/CMakeFiles/edit_cache.dir

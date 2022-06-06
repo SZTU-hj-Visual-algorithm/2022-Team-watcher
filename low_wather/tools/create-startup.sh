@@ -2,7 +2,7 @@
 
 echo "#!/bin/bash" > $2/startup-run
 
-echo "echo dji | sudo -S cpufreq-set -g performance" >> $2/startup-run
+#echo "echo dji | sudo -S cpufreq-set -g performance" >> $2/startup-run
 echo "echo -e \"gnome-terminal -- bash -c \\\"$2/monitor.sh\\\"\">>~/.profile" >> $2/startup-run
 
 echo "echo \"#!/bin/sh\" > ./monitor.sh" >> $2/startup-run

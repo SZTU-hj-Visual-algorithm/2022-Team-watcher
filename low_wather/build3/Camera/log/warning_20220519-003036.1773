@@ -1,4 +1,0 @@
-Log file created at: 2022/05/19 00:30:36
-Running on machine: manifold2
-Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
-W0519 00:30:36.521107  1781 MVCameraBase.cpp:98] Device:(name:KR-SUA133GC-T sn:041070120324)Lost
