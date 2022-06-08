@@ -89,6 +89,11 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	
 	
 	depth = (1-filter)*m_pc(2,0) + filter*depth;
+
+	if (depth > 6.4)
+	{
+	    return false;
+	}
 	
 
 	
@@ -106,7 +111,7 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	Mat eular = (Mat_<float>(3,1)<<ab_pitch/180.0*CV_PI,-ab_yaw/180.0*CV_PI,ab_roll/180.0*CV_PI);
 	Mat rotated_mat;
 	Eigen::Matrix<double,3,3> rotated_matrix;
-    	cv::Rodrigues(eular,rotated_mat);
+	cv::Rodrigues(eular,rotated_mat);
 	cv2eigen(rotated_mat,rotated_matrix);
 	Eigen::Vector3d m_pd = rotated_matrix*m_pc;
 
@@ -117,9 +122,7 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	{
 		t = time;
 		double height = get_gravity(m_pc);
-		double xishu = 5.05 * (2.58/m_pc(2,0));
-		send.yaw = atan2(m_pc(0,0) + 0.106,m_pc(2,0)) / CV_PI*180.0 - ab_yaw;
-		send.pitch = atan2(m_pc(1,0) -0.055 - height*xishu,m_pc(2,0)) / CV_PI*180.0 - ab_pitch;
+		get_send(m_pd,height);
 		kf.Xk_1[0] = m_pd(0,0);
 		kf.Xk_1[3] = m_pd(1,0);
 		//last_yaw = ra_yaw + ab_yaw;
@@ -127,44 +130,7 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 //		last_aim_yaw = ra_yaw - ab_yaw;
 		return true;
 	}
-	
-	/*if (last_ct.x == -1 && last_ct.y == -1)
-	{
-		last_ct.x = bp.x;
-		last_ct.y = bp.y;
-	}*/
-	/*else
-	{
-		if (bp.x - last_ct.x < -10.0)
-		{
-			sp_reset(kf);
-		}
-	}*/
-	
-//	if (aim_yaw - last_aim_yaw < 5 && aim_pitch - last_aim_pitch < 5)
-//	{
-//		stop_predict++;
-//	}
-//	else
-//	{
-//		stop_predict = 0;
-//	}
-//
-	/*if (last_aim_yaw ==0 && last_aim_pitch ==0)
-	{
-		last_aim_pitch = ra_pitch;
-		last_aim_yaw = ra_yaw;
-	}*/
 
-	
-	//-------------------------------------------------------------------------
-	/*if (abs(last_ct.x - bp.x) < 10)
-	{
-		double v = kf.Xk_1[1];
-		double a = kf.Xk_1[2];
-		kf.Xk_1[1] = -(v/abs(v))*0.0001;
-		kf.Xk_1[2] = -(a/abs(a))*0.001;
-	}*/
 	Eigen::Matrix<double, 2, 1> measured;
 	measured << m_pd(0,0), m_pd(1,0);
 	
@@ -178,13 +144,6 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	
 	
 	//-----------------------------------------------------------------------------------------
-	
-	
-	
-	
-	
-	
-	
 	double predict_time = m_pc.norm() / SPEED + shoot_delay;
 	//printf("speed:%lf\n",SPEED);
 	//printf("pre_time:%lf\n",predict_time);
@@ -280,23 +239,7 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	//�������нǶȶ���תΪ�Ƕ���
 	
 	
-	send.yaw = atan2(pos3(0, 0) + 0.106, pos3(2, 0))/PI * 180.0 - ab_yaw;//atan2�ĽǶȷ�Χ��-180~180���պ����нǶȶ��и���,������
-	printf("pos_x:%lf\n",pos3(0,0));
-	/*if (-0.086 < pre_xy[1] && pre_xy[1]< 0.086)
-	{
-		send.yaw = 0.2 * last_yaw + 0.8 * send.yaw; 
-	}
-	else
-	{
-		send.yaw = 0.01*last_yaw + 0.99 * send.yaw;
-	}*/
-	double xishu = 5.02 * (2.27/pos3(2,0));
-
-	send.pitch = atan2(pos3(1, 0) - 0.055 - height *  xishu, pos3(2, 0))/PI * 180.0 - ab_pitch;
-	//send.yaw = ra_yaw + ab_yaw;
-	//send.pitch =ra_pitch - ab_pitch;
-	//-----------------------------------------------------------------------------------
-	//printf("height:%f\n",height);
+	get_send(pos3,height);
 	return true;
 	
 }
