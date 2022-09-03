@@ -649,13 +649,6 @@ int ArmorDetector::num_detect(cv::RotatedRect &f_rect)
 
 bool ArmorDetector::Contain(RotatedRect &match_rect, vector<RotatedRect> &Lights, size_t &i, size_t &j)
 {
-    /// <summary>
-    ///  测试
-    /// </summary>
-    /// <param name="match_rect"></param>
-    /// <param name="Lights"></param>
-    /// <param name="i"></param>
-    /// <returns></returns>
     Rect boud_rect = match_rect.boundingRect();
     for (size_t k=i+1;k<j;k++)
     {
