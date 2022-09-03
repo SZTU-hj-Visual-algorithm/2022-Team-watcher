@@ -253,7 +253,7 @@ private:
 
     int num_detect(cv::RotatedRect &f_rect);
 
-    bool Contain(cv::RotatedRect &match_rect, std::vector<cv::RotatedRect> &Lights, size_t &i);
+    bool Contain(cv::RotatedRect &match_rect, std::vector<cv::RotatedRect> &Lights, size_t &i, size_t &j);
 
     static inline bool area_sort(std::vector<cv::Point> &cnt1,std::vector<cv::Point> &cnt2)
     {
