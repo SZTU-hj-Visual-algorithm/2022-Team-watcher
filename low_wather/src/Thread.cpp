@@ -110,8 +110,12 @@ void* Armor_Kal(void* PARAM)
 		//printf("speed:%lf\n",lin[3]);
 		if (mode_temp == 0x21)
 		{
-			RotatedRect mubiao_get = shibie.getTargetAera(src_copy, 0, 0);
-
+		    aim_information aim_get = shibie.getTargetAera(src_copy, 0, 0);
+		    RotatedRect mubiao_get = aim_get.final_rect;
+		    if (aim_get.class_id == 0)
+		    {
+		        mubiao_get = RotatedRect();
+		    }
 			pthread_mutex_lock(&mutex_ka);
 			send_data.ROT = mubiao_get;
 			send_data.Armor_type = shibie.isSamllArmor();

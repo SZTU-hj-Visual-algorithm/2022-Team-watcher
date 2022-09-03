@@ -13,7 +13,7 @@ public:
 	float ab_yaw = 0.0;
 	float ab_roll = 0.0;
 	float SPEED = 25.0;
-	int enemy_color;
+	int enermy_color;
 };
 
 #endif //DEMO_ROBOT_STATE_H

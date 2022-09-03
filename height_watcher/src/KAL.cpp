@@ -90,7 +90,10 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 	
 	depth = (1-filter)*m_pc(2,0) + filter*depth;
 	
-
+    if (depth > 6.4)
+    {
+        return false;
+    }
 	
 	//m_pc(2,0) = depth > 2.5? depth : depth*1.05;
 	
@@ -206,7 +209,7 @@ bool KAL::predict(RotatedRect &detection, kal_filter& kf, double time)
 //	printf("pos_x:%lf\n",pos3(0,0));
 //	double xishu = 5.02 * (2.27/pos3(2,0));
 //	send.pitch = atan2(pos3(1, 0) - 0.055 - height *  xishu, pos3(2, 0))/PI * 180.0 - ab_pitch;
-        get_send(pos3,height);
+    get_send(pos3,height);
 	return true;
 	
 }

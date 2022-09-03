@@ -1,3 +1,9 @@
+//
+// Created by 蓬蒿浪人 on 2022/8/23.
+//
+
+#ifndef NUM_DECTEC_ARMORDETECTOR_H
+#define NUM_DECTEC_ARMORDETECTOR_H
 /*******************************************************************************************************************
 Copyright 2017 Dajiang Innovations Technology Co., Ltd (DJI)
 
@@ -18,13 +24,15 @@ IN THE SOFTWARE.
 #pragma once
 
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 //#include "KAl.h"
-#include "robot_state.h"
 #include "opencv2/dnn/dnn.hpp"
+#include "robot_state.h"
 
 #define TRUNC_ABS(a) ((a) > 0 ? (a) : 0);
 #define POINT_DIST(p1,p2) std::sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y))
 
+//enum EnemyColor { RED = 0, BLUE = 1};
 
 // 很多成员都已经弃用了
 struct ArmorParam {
@@ -42,37 +50,21 @@ struct ArmorParam {
     int bin_cls_thres;          // 二分类防止三根灯条的分割阈值
     float target_max_angle;
 
-    // 默认的构造值
-    //ArmorParam(){
-    //    min_light_height = 8;
-    //    light_slope_offset = 30;
-    //    max_light_delta_h = 450;
-    //    min_light_delta_h = 12;
-    //    max_light_delta_v = 50;
-    //    max_light_delta_angle = 30;
-    //    near_face_v = 600;
-    //    max_lr_rate = 1.5;
-    //    max_wh_ratio = 5.2;
-    //    min_wh_ratio = 1.25;
-    //    small_armor_wh_threshold = 3.6;
-    //    bin_cls_thres = 166;
-    //    target_max_angle = 20;
-    //}
-	ArmorParam() {   ////这里是按照文件里修改的
-		min_light_height = 10;
-		light_slope_offset = 30;
-		max_light_delta_h = 720;
-		min_light_delta_h = 20;
-		max_light_delta_v = 100;
-		max_light_delta_angle = 30;
-		near_face_v = 100;
-		max_lr_rate = 1.99;
-		max_wh_ratio = 5.02;
-		min_wh_ratio = 1.03;
-		small_armor_wh_threshold = 3.3;
-		bin_cls_thres = 166;
-		target_max_angle = 20;
-	}
+    ArmorParam() {   ////这里是按照文件里修改的
+        min_light_height = 10;
+        light_slope_offset = 30;
+        max_light_delta_h = 720;
+        min_light_delta_h = 20;
+        max_light_delta_v = 100;
+        max_light_delta_angle = 30;
+        near_face_v = 100;
+        max_lr_rate = 1.99;
+        max_wh_ratio = 5.02;
+        min_wh_ratio = 1.13;
+        small_armor_wh_threshold = 2.96;
+        bin_cls_thres = 166;
+        target_max_angle = 20;
+    }
 };
 
 // 匹配灯条的结构体
@@ -98,19 +90,46 @@ struct Detect_data {
     double t;
 };
 
+struct aim_information{
+    cv::RotatedRect final_rect;
+    int class_id;
+};
 
 
-class ArmorDetector:public robot_state {
+
+class ArmorDetector:public robot_state{
 public:
     // 无参构造函数，默认全部都为false
     ArmorDetector(/*const ArmorParam & para = ArmorParam()*/){
-//        _para = para;
+        //        _para = para;
         _res_last = cv::RotatedRect();
         _dect_rect = cv::Rect();
         _is_small_armor = false;
         _lost_cnt = 0;
-        _is_lost = true;     
+        _is_lost = true;
+        cv::Mat temp1 = cv::imread("../template/1.png");
+        cv::Mat temp3 = cv::imread("../template/3.png");
+        cv::Mat temp4 = cv::imread("../template/4.png");
+        cv::Mat temp2 = cv::imread("../template/2.png");
+        cv::Mat temp6 = cv::imread("../template/6.png");
+        cv::Mat temp8 = cv::imread("../template/8.png");
+
+        cvtColor(temp1,temp1,cv::COLOR_BGR2GRAY);
+        cvtColor(temp3,temp3,cv::COLOR_BGR2GRAY);
+        cvtColor(temp4,temp4,cv::COLOR_BGR2GRAY);
+        cvtColor(temp2,temp2,cv::COLOR_BGR2GRAY);
+        cvtColor(temp6,temp6,cv::COLOR_BGR2GRAY);
+        cvtColor(temp8,temp8,cv::COLOR_BGR2GRAY);
+
+        //        imshow("temp1",temp1);
+        temps.push_back(temp1);
+        temps.push_back(temp3);
+        temps.push_back(temp4);
+        temps.push_back(temp2);
+        temps.push_back(temp6);
+        temps.push_back(temp8);
     }
+
 
     int sentry_mode;  // 哨兵模式
     int base_mode;    // 吊射基地模式
@@ -142,7 +161,7 @@ public:
         return _is_small_armor;
     }
 
-    cv::RotatedRect getTargetAera(const cv::Mat & src, const int & sb_mode, const int &jd_mode);
+    aim_information getTargetAera(const cv::Mat & src, const int & sb_mode, const int &jd_mode);
 
 
     void setLastResult(const cv::RotatedRect & rect){
@@ -161,7 +180,7 @@ public:
         return _para.near_face_v;
     }
 
-    
+
 private:
 
     /**
@@ -232,11 +251,35 @@ private:
         return makeRectSafe(rect, size);
     }
 
+    int num_detect(cv::RotatedRect &f_rect);
+
+    bool Contain(cv::RotatedRect &match_rect, std::vector<cv::RotatedRect> &Lights, size_t &i);
+
+    static inline bool area_sort(std::vector<cv::Point> &cnt1,std::vector<cv::Point> &cnt2)
+    {
+        return cv::contourArea(cnt1) > cv::contourArea(cnt2);
+    }
+
+    inline bool inside(cv::Point2f &p, cv::Rect &rect)
+    {
+        int x_start = rect.x;
+        int y_start = rect.y;
+        int x_limit = rect.x+rect.width;
+        int y_limit = rect.y+rect.height;
+        if ((p.x>x_start)&&(p.x<x_limit)&&(p.y>y_start)&&(p.y<y_limit))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 private:
-//public:
+    //public:
     /*AngleSolver* s_solver;
     AngleSolver * l_solver;*/
-    
+
     bool _is_lost;
     ArmorParam _para = ArmorParam();               // parameter of alg
     int _lost_cnt;                  // 失去目标的次数，n帧没有识别到则全局搜索
@@ -252,4 +295,9 @@ private:
     cv::dnn::Net net;//    cv::Mat _gray;//留着以后自己加神经网络
     cv::Mat _b;
     cv::Mat _r;
+    double max_num = 0.65;
+    std::vector<cv::Mat> temps;
+    cv::Point2f dst_p[4] = {cv::Point2f(0,60),cv::Point2f(0,0),cv::Point2f(30,0),cv::Point2f(30,60)};
 };
+
+#endif //NUM_DECTEC_ARMORDETECTOR_H
