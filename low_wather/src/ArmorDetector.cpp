@@ -673,5 +673,5 @@ bool ArmorDetector::Contain(RotatedRect &match_rect, vector<RotatedRect> &Lights
             return false;
         }
     }
-    return true; //不进循环，相邻灯条，返回true
+    return false; //不进循环，相邻灯条，主函数不做continue，返回false
 }
