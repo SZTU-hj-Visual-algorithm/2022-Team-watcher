@@ -3,23 +3,6 @@
 //
 #include "ArmorDetector.hpp"
 
-/*******************************************************************************************************************
-Copyright 2017 Dajiang Innovations Technology Co., Ltd (DJI)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files(the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and / or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions :
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of
-the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-IN THE SOFTWARE.
-*******************************************************************************************************************/
-
 //#include "ArmorDetector.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
@@ -31,6 +14,9 @@ IN THE SOFTWARE.
 //#define COUT_LOG
 //#define CLASSIFICATION
 
+//#define draw_bar_after_if4
+//#define draw_before_condition
+//#define draw_after_condition
 
 using namespace cv;
 using namespace std;
@@ -218,6 +204,11 @@ vector<matched_rect> ArmorDetector::findTarget() {
                 // 筛除横着的以及太小的旋转矩形 (本来是45的，后来加成60)
                 if ((if1 || if2) && if3 && if4)
                 {
+
+#ifdef draw_bar_after_if4
+                    drawContours(_src, contours_max, i, Scalar(255, 255, 255), 2, LINE_8);
+#endif draw_bar_after_if4
+
                     RectFirstResult.push_back(rrect);
                 }
     }
@@ -322,6 +313,17 @@ vector<matched_rect> ArmorDetector::findTarget() {
                 if (condition1 && condition2 && condition3 && condition4)
                 {
                     RotatedRect obj_rect = boundingRRect(rect_i, rect_j);
+
+                    //------  draw rectangle
+#ifdef draw_before_condition
+                    Point2f vertice[4];
+                    obj_rect.points(vertice);
+                    // picture choose and rrt's points
+                    for (int i = 0; i < 4; i++)
+                        line(_src, vertice[i], vertice[(i + 1) % 4], Scalar(255, 255, 255), 2);
+
+#endif draw_before_condition
+
                     if (Contain(obj_rect,RectFirstResult,i,j))
                     {
                         continue;
@@ -345,6 +347,14 @@ vector<matched_rect> ArmorDetector::findTarget() {
 					obj_rect.points(vertice);
 					for (int i = 0; i < 4; i++)
 						line(FirstResult, vertice[i], vertice[(i + 1) % 4], Scalar(255, 255, 255), 2);*/
+
+#ifdef draw_before_condition
+                    Point2f verticem[4];
+                    match_rects.points(verticem);
+                    // picture choose and rrt's points
+                    for (int i = 0; i < 4; i++)
+                        line(_src, verticem[i], verticem[(i + 1) % 4], Scalar(255, 255, 255), 2);
+#endif draw_before_condition
 
                 }
             }
@@ -422,9 +432,9 @@ cv::RotatedRect ArmorDetector::chooseTarget(const std::vector<matched_rect> & ma
             imshow("2.jpg", roi);
 #endif
             // 阈值可通过实际测量修改
-            if (avg > 57.00)
+            if (avg > 30.00)
                 continue;
-            if (stddev < 15.8)
+            if (stddev < 7.8)
                 continue;
         }
 
@@ -620,7 +630,7 @@ int ArmorDetector::num_detect(cv::RotatedRect &f_rect)
 
         matchTemplate(num_roi,temps[i],result,TM_CCORR_NORMED);
         minMaxLoc(result,&minVal, &maxVal, &minLoc, &maxLoc);
-        printf("max_val:%lf\n",maxVal);
+        //printf("max_val:%lf\n",maxVal);
         if((maxVal > max_num)&&(maxVal > max_val))
         {
             max_index = i;
@@ -663,4 +673,5 @@ bool ArmorDetector::Contain(RotatedRect &match_rect, vector<RotatedRect> &Lights
             return false;
         }
     }
+    return true; //不进循环，相邻灯条，返回true
 }
