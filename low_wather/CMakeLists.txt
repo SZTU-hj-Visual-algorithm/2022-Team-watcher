@@ -49,5 +49,5 @@ target_link_libraries(${BIN_NAME} /lib/libMVSDK.so)
 #target_link_libraries(${BIN_NAME} ${EIGEN3_LIBS})
 #target_link_libraries( snack Common -lpthread -lm)
 
-ADD_CUSTOM_command(TARGET ${BIN_NAME} COMMAND "${PROJECT_SOURCE_DIR}/tools/create-startup.sh" "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/tools")
+#ADD_CUSTOM_command(TARGET ${BIN_NAME} COMMAND "${PROJECT_SOURCE_DIR}/tools/create-startup.sh" "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/tools")
 
