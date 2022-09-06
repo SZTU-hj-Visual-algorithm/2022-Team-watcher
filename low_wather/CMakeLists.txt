@@ -7,7 +7,7 @@ SET(BIN_NAME "run")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-find_package(OpenCV 3.4.7 REQUIRED)
+find_package(OpenCV 4.5.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 #find_package(Threads REQUIRED)
 find_package(X11 REQUIRED)
@@ -49,5 +49,5 @@ target_link_libraries(${BIN_NAME} /lib/libMVSDK.so)
 #target_link_libraries(${BIN_NAME} ${EIGEN3_LIBS})
 #target_link_libraries( snack Common -lpthread -lm)
 
-ADD_CUSTOM_command(TARGET ${BIN_NAME} COMMAND "${PROJECT_SOURCE_DIR}/tools/create-startup.sh" "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/tools")
+#ADD_CUSTOM_command(TARGET ${BIN_NAME} COMMAND "${PROJECT_SOURCE_DIR}/tools/create-startup.sh" "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/tools")
 

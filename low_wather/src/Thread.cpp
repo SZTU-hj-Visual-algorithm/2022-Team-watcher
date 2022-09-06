@@ -20,7 +20,7 @@ form send_data;
 
 Mat ka_src_get;
 
-SerialPort port("/dev/ttyUSB");
+SerialPort port("/dev/ttyUSB0");
 
 void* Build_Src(void* PARAM)
 {
@@ -103,9 +103,10 @@ void* Armor_Kal(void* PARAM)
 		bool small_energy = false;
 		int lin_is_get;
 		//lin_is_get = true;
-		lin_is_get = port.get_Mode1(mode_temp, lin[0], lin[1], lin[2], lin[3],shibie.enemy_color);
+		lin_is_get = port.get_Mode1(mode_temp, lin[0], lin[1], lin[2], lin[3],shibie.enermy_color);
 		//mode_temp = 0x22;
-		printf("mode:%x\n",shibie.enemy_color);
+		shibie.enermy_color = RED;
+		//printf("mode:%x\n",shibie.enemy_color);
 		//printf("mode_temp:%x\n",mode_temp);
 		//printf("speed:%lf\n",lin[3]);
 		if (mode_temp == 0x21)
