@@ -196,7 +196,7 @@ private:
      * @param rects candidate rectangles
      * @return the most likely armor (RotatedRect() returned if no proper one)
      */
-    cv::RotatedRect chooseTarget(const std::vector<matched_rect> &match_rects/*, const std::vector<double> & score*/, const cv::Mat &src);
+    aim_information chooseTarget(const std::vector<matched_rect> &match_rects/*, const std::vector<double> & score*/, const cv::Mat &src);
     /**
      * @brief 将左右的两根灯条用一个旋转矩形拟合并返回
      * @brief boundingRRect Bounding of two ratate rectangle (minumum area that contacts two inputs)
