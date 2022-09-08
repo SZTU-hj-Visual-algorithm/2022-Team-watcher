@@ -78,10 +78,10 @@ public:
 
     inline void get_send(Eigen::Vector3d &pos, double height)
     {
-        send.yaw = atan2(pos3(0, 0) + 0.106, pos3(2, 0))/PI * 180.0 - ab_yaw;
-        double xishu = 5.02 * (3.10/pos3(2,0));
+        send.yaw = atan2(pos(0, 0) + 0.106, pos(2, 0))/PI * 180.0 - ab_yaw;
+        double xishu = 5.02 * (3.10/pos(2,0));
 
-        send.pitch = atan2(pos3(1, 0) - 0.055 - height *  xishu, pos3(2, 0))/PI * 180.0 - ab_pitch;
+        send.pitch = atan2(pos(1, 0) - 0.055 - height *  xishu, pos(2, 0))/PI * 180.0 - ab_pitch;
     }
 	
 	struct information {
