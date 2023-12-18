@@ -93,20 +93,7 @@ void ArmorDetector::setImage(const cv::Mat & src){
     Mat element = getStructuringElement(MORPH_CROSS, Size(3, 3));
     // 敌方颜色为红色时
     if (enermy_color == RED){
-        //cout<<"in"<<endl;
-        //Mat thres_whole;
 
-        //cvtColor(_src,thres_whole,CV_BGR2GRAY);
-
-        /*
-		if (sentry_mode)
-			threshold(thres_whole,thres_whole,33,255,THRESH_BINARY);
-		else
-        threshold(thres_whole,thres_whole,60,255,THRESH_BINARY);*////这里初步猜测是用来排除日光灯的影响的
-        ////但经过实测，如果降低相机的对焦清晰度，或是用其他的方法把原图的清晰度降低也可以排除日光灯的干扰
-        ////但降低对焦清晰度不知道会不会影响远距离的识别
-
-        //imshow("thresh_whole", thres_whole);////测试亮度
 
         //不是这里的问题
         int srcdata = _src.rows * _src.cols;
@@ -132,16 +119,7 @@ void ArmorDetector::setImage(const cv::Mat & src){
     }
     // 敌方颜色是蓝色时
     else {
-        //Mat thres_whole;
-        //vector<Mat> splited;
-        //split(_src, splited);
-        //cvtColor(_src,thres_whole,CV_BGR2GRAY);
-        //if (sentry_mode)
-        //threshold(thres_whole,thres_whole,60,255,THRESH_BINARY);
-        //else
-        //threshold(thres_whole,thres_whole,128,255,THRESH_BINARY);
 
-        //imshow("thres_whole", thres_whole);
 
         int srcdata = _src.rows * _src.cols;
 
@@ -365,11 +343,14 @@ vector<matched_rect> ArmorDetector::findTarget() {
 
 
 
-cv::RotatedRect ArmorDetector::chooseTarget(const std::vector<matched_rect> & match_rects, const cv::Mat & src) {
+aim_information ArmorDetector::chooseTarget(const std::vector<matched_rect> & match_rects, const cv::Mat & src) {
     // 如果没有两条矩形围成一个目标装甲板就返回一个空的旋转矩形
     if (match_rects.size() < 1){
         _is_lost = true;
-        return RotatedRect();
+        aim_information Aim_i;
+        Aim_i.class_id = 0;
+        Aim_i.final_rect=RotatedRect();
+        return Aim_i;
     }
 
 
@@ -453,7 +434,19 @@ cv::RotatedRect ArmorDetector::chooseTarget(const std::vector<matched_rect> & ma
         ret_idx = 1;
     }
     //================================ 到这里才结束循环 =======================================
+    // ret_idx为 -1 就说明没有目标
+    if (ret_idx == -1){
+        _is_lost = true;
+        aim_information Aim_i;
+        Aim_i.class_id = 0;
+        Aim_i.final_rect=RotatedRect();
+        return Aim_i;
+    }
+    // 否则就证明找到了目标
+    _is_lost = false;
+
     int final_index = 0;
+    aim_information Aim_Inf;
     if (candidate.size() > 1){
         // 将候选矩形按照高度大小排序，选出最大的（距离最近）
         sort(candidate.begin(), candidate.end(),
@@ -469,17 +462,28 @@ cv::RotatedRect ArmorDetector::chooseTarget(const std::vector<matched_rect> & ma
         float temp_angle = candidate[0].armor_angle;
         float temp_lr_rate = candidate[0].bar_lr_rate;
         float temp_angle_abs = candidate[0].bar_angle_abs;
-        float temp_weight = temp_angle + temp_lr_rate;
+
 
         for (int i = 1; i < candidate.size(); i++){
             double angle = match_rects[candidate[i].index].rect.angle;
-            if ( candidate[0].armor_height / candidate[i].armor_height < 1.1){
-                if (candidate[i].armor_angle < temp_angle
-                /*&& (candidate[i].bar_lr_rate */){
-                    temp_angle = candidate[i].armor_angle;
-                    if (candidate[i].bar_lr_rate < 1.66) final_index = i;
+            RotatedRect f_rect = match_rects[candidate[i].index].rect;
+            int armor_id = num_detect(f_rect);
+            if (armor_id)
+            {
+                if ( candidate[0].armor_height / candidate[i].armor_height < 1.1)
+                {
+                    if (candidate[i].armor_angle < temp_angle)
+                    {
+                        temp_angle = candidate[i].armor_angle;
+                        if (candidate[i].bar_lr_rate < 1.55)
+                        {
+                            final_index = i;
+                            Aim_Inf.class_id=armor_id;
+                        }
+                    }
                 }
             }
+
         }
     }
 
@@ -495,16 +499,9 @@ cv::RotatedRect ArmorDetector::chooseTarget(const std::vector<matched_rect> & ma
     imshow("final_rect", rect_show);
 #endif
 
-    // ret_idx为 -1 就说明没有目标
-    if (ret_idx == -1){
-        _is_lost = true;
-        return RotatedRect();
-    }
-    // 否则就证明找到了目标
-    _is_lost = false;
     _is_small_armor = candidate[final_index].is_small_armor;
-    RotatedRect ret_rect = match_rects[candidate[final_index].index].rect;
-    return ret_rect;
+    Aim_Inf.final_rect = match_rects[candidate[final_index].index].rect;
+    return Aim_Inf;
 }
 
 
@@ -515,7 +512,8 @@ aim_information ArmorDetector::getTargetAera(const cv::Mat & src, const int & sb
     base_mode = jd_mode;
     setImage(src);  // function called
     vector<matched_rect> match_rects = findTarget(); // function called
-    RotatedRect final_rect = chooseTarget(match_rects, src);  // function called
+    aim_information aim_inf = chooseTarget(match_rects, src);
+    RotatedRect final_rect = aim_inf.final_rect;
 
     if(final_rect.size.width != 0){
         // 最后才加上了偏移量，前面那些的坐标都是不对的，所以不能用前面那些函数解角度
@@ -542,10 +540,7 @@ aim_information ArmorDetector::getTargetAera(const cv::Mat & src, const int & sb
         else if (_lost_cnt > 33 )
             _res_last = RotatedRect();
     }
-    int class_num = num_detect(final_rect);
-    aim_information aim_inf;
     aim_inf.final_rect = final_rect;
-    aim_inf.class_id = class_num;
     return aim_inf;
 }
 
